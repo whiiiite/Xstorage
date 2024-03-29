@@ -1,0 +1,314 @@
+﻿@model Xstorage.Entities.ViewModels.DetailStorageViewModel;
+@using Xstorage.Mixins;
+@using Xstorage.Extentions;
+@inject Xstorage.Data.XstorageDbContext context;
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+@section AddToHead {
+    <link rel="stylesheet" href="~/css/pages-styles/storage-details.css" asp-append-version="true" />
+}
+
+@section AddToBody {
+    @if (Model.VisitorIsHost)
+    {
+        <div id="create-folder-dialog-container" style="display: none;" class="dialog-container">
+            <div id="input-dialog-section" class="input-container">
+                @using (Html.BeginForm("CreateDirectory", "Storages", FormMethod.Post,
+               new { id = "create-folder-form", @class = "input-container" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <input style="display: none;" name="storageId" value="@Model.Id" />
+                    <input style="display: none;" name="path" value="@Model.Path" />
+
+                    <label>Name of folder:</label>
+                    <input id="folder-name-field" maxlength="70" name="dirName" type="text" />
+
+                    <input id="create-folder-submit" class="create-button"
+                           type="submit" value="Create" />
+                }
+
+                <span id="create-folder-error-span" style="color: red;"></span>
+            </div>
+        </div>
+
+        <div id="upload-file-dialog-container" style="display: none;" class="dialog-container">
+            <div id="input-dialog-file-section" class="input-container">
+                @using (Html.BeginForm("CreateFile", "Storages", FormMethod.Post,
+               new { id = "create-file-form", @class = "input-container", enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <input style="display: none;" name="storageId" value="@Model.Id" />
+                    <input style="display: none;" name="path" value="@Model.Path" />
+
+                    <label>Name of empty file:</label>
+                    <input id="file-name-field" maxlength="70" name="fileName" type="text" />
+
+                    <label>Or choose file from local storage:</label>
+                    <input id="choose-file-field" name="files" type="file" multiple />
+
+                    <input id="create-file-submit" class="create-button"
+                           type="submit" value="Create" />
+                }
+                <span id="upload-file-error-span" style="color: red;"></span>
+            </div>
+        </div>
+
+        <div style="display: none;" id="delete-item-confirm-container" class="dialog-container">
+            <div id="input-dialog-delete-section" class="input-container">
+                <form id="delete-item-form" method="get" class="input-container">
+                    @Html.AntiForgeryToken()
+                    <p class="text-danger">
+                        Are you sure that want to delete this item?
+                    </p>
+                    <input id="delete-item-submit" class="create-button"
+                           type="button" value="Delete" />
+                </form>
+                <span id="delete-item-error-span" style="color: red;"></span>
+            </div>
+        </div>
+    } 
+}
+
+<div>
+    <a style="float: right;" asp-action="Index"> &larr; Back to Storages</a>
+</div>
+
+<div>
+    <div style="display: flex; flex-direction: row;">
+        @for (int i = 0; i < Model.PathParts.Length; i++)
+        {
+            <div>
+                <a asp-action="Details" 
+                    asp-route-id="@Model.Id"
+                   asp-route-path="@string.Join("\\", Model.PathParts.Take(i + 1))">
+                    @Model.PathParts[i]
+                </a>
+                <span> > </span>
+            </div>
+        }
+    </div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.IsPrivate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.IsPrivate)
+        </dd>
+        <dt class="col-sm-2">
+            Owner of storage:
+        </dt>
+        <dd class="col-sm-10">
+            @Model.UserNameOfHost
+        </dd>
+    </dl>
+
+    <hr/>
+
+    @if (Model.VisitorIsHost)
+    {
+        <a class="make-action-link"
+           id="upload-file-button"
+           href="#">
+            &oplus; Add
+            <span style="color: dimgray;">
+                <b>file(s)</b>
+            </span> here
+        </a>
+
+        <a class="make-action-link"
+           id="create-folder-button"
+           href="#">
+            &oplus; Create new
+            <span style="color: darkorange;">
+                <b>folder</b>
+            </span>
+        </a>
+    }
+
+    <div class="items-container">
+        @if (!Model.ItemsData.Any())
+        {
+            <div style="display: flex; align-items: center; flex-direction: column; justify-content: center; font-family: Tahoma; font-size: 20px;">
+                <img width="128" height="128" src="~/images/create-item-light.png" />
+                <span>Empty. But you can create something here.</span>
+            </div>
+        }
+        else
+        {
+            <table class="main-table" width="100%" style="overflow: hidden;">
+                <thead>
+                    <tr>
+                        <td width="50%">Name</td>
+                        <td width="30%">Size</td>
+                        <td>Last edit</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (FileSystemItemData item in Model.ItemsData)
+                    {
+                        <tr>
+                            <td>
+                                <div>
+                                    @if (item.IsDirectory)
+                                    {
+                                        <div style="display: flex; align-items: center;">
+                                            <img width="24" height="24" src="~/images/folder-light.png" />
+                                            <a style="margin-left: 10px;
+                                                asp-controller="Storages" 
+                                                asp-action="Details" 
+                                                asp-route-id="@Model.Id"
+                                                asp-route-path="@System.IO.Path.Combine(Model.Path, item.Name)">
+                                            @item.Name
+                                            </a>
+                                          </div>
+                                    }
+                                    else
+                                    {
+                                        <div style="display: flex; align-items: center;">
+                                            <img width="22" height="22" src="~/images/file-light.png" />
+                                            <a style="margin-left: 10px;" href="#file">@item.Name</a>
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                            <td>@item.SizeInString</td>
+                            <td>@item.LastEditTimeAgoString</td>
+                            <td>
+                                <div style="display: flex; flex-direction: row; justify-content: end;">
+                                    @if (!item.IsDirectory) // if is file
+                                    {
+                                        <div class="gray-circle-on-hover">
+                                            <a class="action-link-btn" asp-action="GetFile" asp-controller="Storages"
+                                            asp-route-storageId="@Model.Id"
+                                            asp-route-name="@item.Name" download>
+                                                <img class="w28p h28p" src="~/images/dowload-file-light.png" />
+                                            </a>
+                                        </div>
+                                    }
+                                    @if (Model.VisitorIsHost)
+                                    {
+                                        <div class="red-circle-on-hover" style="margin-left: 10px;">
+                                            <a class="text-danger action-link-btn"
+                                               onclick="showDeleteItemDialog(event)"
+                                               asp-action="DeleteItem"
+                                               asp-route-id="@Model.Id"
+                                               asp-route-currentPath="@Model.Path"
+                                               asp-route-pathOfDelete="@item.Path"
+                                               asp-route-isDirectory="@item.IsDirectory">
+                                                <img class="w28p h28p" src="~/images/delete-bin-light.png" />
+                                            </a>
+
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>    
+        }
+        
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        /* +------------------ CREATE FOLDER SECTION ------------------+ */
+        const createFolderButton = document.getElementById("create-folder-button");
+        const createFolderDialog = document.getElementById("create-folder-dialog-container");
+        const inputCreateFolderDialog = document.getElementById("input-dialog-section");
+        const createFolderSubmit = document.getElementById("create-folder-submit");
+        const folderNameField = document.getElementById("folder-name-field");
+        const createFolderErrorSpan = document.getElementById("create-folder-error-span");
+        const createFolderForm = document.getElementById("create-folder-form");
+
+        createFolderForm.onsubmit = function (event) { 
+            return createFolderSumbit(event); 
+        };
+
+        createFolderDialog.onclick = closeCreateFolderDialog;
+        createFolderButton.onclick = openCreateFolderDialog;
+        inputCreateFolderDialog.onclick = inputCreateFolderDialogClick;
+
+        function closeCreateFolderDialog(event) {
+            createFolderDialog.style.display = "none";
+        }
+
+        function openCreateFolderDialog(event) {
+            createFolderDialog.style.display = "flex";
+        }
+
+        function inputCreateFolderDialogClick(event) {
+            event.stopPropagation();
+        }
+
+        function createFolderSumbit(event) {
+            if (folderNameField.value.trim() === '') {
+                createFolderErrorSpan.innerHTML = "<b>Folder name must be filled</b>";
+                event.preventDefault();
+                return false;
+            }
+            createFolderErrorSpan.textContent = '';
+
+            return true;
+        }
+        /* +------------------ CREATE / UPLOAD FILE SECTION ------------------+ */
+
+        const uploadFileDialogContainer = document.getElementById("upload-file-dialog-container");
+        const uploadFileButton = document.getElementById("upload-file-button");
+        const uploadFileInputSection = document.getElementById("input-dialog-file-section");
+
+        uploadFileButton.onclick = showUploadFileDialog;
+        uploadFileInputSection.onclick = uploadFileInputSectionClick;
+        uploadFileDialogContainer.onclick = closeUploadFileDialog;
+
+        function closeUploadFileDialog(event) {
+            uploadFileDialogContainer.style.display = "none";
+        }
+
+        function showUploadFileDialog(event) {
+            uploadFileDialogContainer.style.display = "flex";
+        }
+
+        function uploadFileInputSectionClick(event) {
+            event.stopPropagation();
+        }
+
+        /* +------------------ DELETE ITEM SECTION ------------------+ */
+        const deleteItemDialogContainer = document.getElementById("delete-item-confirm-container");
+        const deleteItemInputSection = document.getElementById("input-dialog-delete-section");
+        const deleteItemButton = document.getElementById("delete-item-submit");
+
+        deleteItemDialogContainer.onclick = closeDeleteItemDialog;
+        deleteItemInputSection.onclick = deleteItemInputSectionClick;
+        deleteItemButton.onclick = deleteItemButtonClick;
+        let deleteHREF = "";
+
+        function closeDeleteItemDialog(event) {
+            deleteItemDialogContainer.style.display = "none";
+        }
+
+        function showDeleteItemDialog(event) {
+            event.preventDefault();
+            console.log(event.target.parentNode);
+            deleteHREF = event.target.parentNode.getAttribute("href");
+            deleteItemDialogContainer.style.display = "flex";
+        }
+
+        function deleteItemInputSectionClick(event) {
+            event.stopPropagation();
+        }
+
+        function deleteItemButtonClick(event) {
+            event.stopPropagation();
+            window.location.href = deleteHREF;
+        }
+    </script>
+}

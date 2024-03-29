@@ -1,0 +1,70 @@
+﻿@model IEnumerable<Xstorage.Entities.Models.Storage>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Storages list</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+    @if (User.IsInRole("Administrator"))
+    {
+        <a asp-action="CreateTestStorages" asp-route-count="30">Create test 30</a>
+        <a asp-action="CreateTestStorages" asp-route-count="50">Create test 50</a>
+        <a asp-action="CreateTestStorages" asp-route-count="70">Create test 70</a>
+        <a asp-action="CreateTestStorages" asp-route-count="120">Create test 120</a>
+    }
+</p>
+<span>You takes @ViewBag.MemUserTakes of memory space of @ViewBag.MemAvailableForUser</span>
+<br />
+<progress max="100" value="@((int)ViewBag.PercentTaken)"></progress>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                Private
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id" asp-route-path="@item.Name">@Html.DisplayFor(modelItem => item.Name)</a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsPrivate)
+            </td>
+            <td>
+                <a class="text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+
+@if(Model.Count() > 0)
+{
+    int totalPages = (int)Math.Ceiling((double)ViewBag.UserStoragesCount / ViewBag.PageSize);
+
+    <div>
+        Page:
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            if (ViewBag.CurrentPage != i)
+            {
+                <a href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize })">@i</a>
+            }
+            else
+            {
+                <span>@i</span>
+            }
+        }
+    </div>   
+}
