@@ -113,7 +113,7 @@ namespace Xstorage.Repositories
         public async Task<long> CountMemoryUserTakesInServerAsync(IIdentity userIdentity)
         {
             if (userIdentity == null)
-            {
+            { 
                 throw new ArgumentNullException("IIdentity is null");
             }
 
@@ -125,6 +125,7 @@ namespace Xstorage.Repositories
                 DirectoryInfo dirInfo = new DirectoryInfo(storage.FullPath);
                 dirSize += await Task.Run(() => dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length));
             }
+
             return dirSize;
         }
     }
