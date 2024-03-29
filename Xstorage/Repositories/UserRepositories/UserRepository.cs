@@ -16,17 +16,16 @@ namespace Xstorage.Repositories
         readonly XstorageDbContext context;
         readonly UserManager<User>? userManager;
         readonly StorageRepository storageRepository;
+        readonly SubscriptionRepository subscriptionRepository;
 
-        //public UserRepository(XstorageDbContext context)
-        //{
-        //    this.context = context;
-        //}
-
-        public UserRepository(XstorageDbContext context, UserManager<User> userManager, StorageRepository storageRepository)
+        public UserRepository(XstorageDbContext context, UserManager<User> userManager,
+            StorageRepository storageRepository,
+            SubscriptionRepository subscriptionRepository)
         {
             this.context = context;
             this.userManager = userManager;
             this.storageRepository = storageRepository;
+            this.subscriptionRepository = subscriptionRepository;
         }
 
         /// <summary>
@@ -55,9 +54,8 @@ namespace Xstorage.Repositories
 
                 user = await userManager.FindByEmailAsync(userData.Email);
 
-                var subRepo = new SubscriptionRepository(context);
                 Subscription subscription = SubscriptionRepository.InitSubscription(user.Id);
-                await subRepo.AddSubscriptionAsync(subscription);
+                await subscriptionRepository.AddSubscriptionAsync(subscription);
             }
 
             return res.Errors;

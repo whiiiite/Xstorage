@@ -63,7 +63,6 @@ namespace Xstorage.Controllers
                 {
                     await subscriptionRepository.AddSubscriptionAsync(
                         SubscriptionRepository.InitSubscription(user.Id));
-                    return NotFound("Not found_2. Refresh the page please.");
                 }
 
                 long userBytesTakes = await userRepository.CountMemoryUserTakesInServerAsync(User.Identity!);

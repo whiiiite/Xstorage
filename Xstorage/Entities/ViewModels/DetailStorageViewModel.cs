@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections;
+using System.ComponentModel;
 using Xstorage.Mixins;
 
 namespace Xstorage.Entities.ViewModels
@@ -28,6 +29,6 @@ namespace Xstorage.Entities.ViewModels
 
         public string HostId { get; set; }
 
-        public List<FileSystemItemData> ItemsData { get; set; } = null!;
+        public IEnumerable<FileSystemItemData> ItemsData { get; set; } = null!;
     }
 }

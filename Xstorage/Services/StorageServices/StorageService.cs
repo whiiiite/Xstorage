@@ -69,7 +69,7 @@ namespace Xstorage.Services
                 HostId = storage.HostId,
                 PathParts = pathParts,
                 Path = path,
-                ItemsData = DirectoryHelper.GetDataOfItems(Path.Combine(storage.Path, path)).ToList(),
+                ItemsData = DirectoryHelper.GetDataOfItems(Path.Combine(storage.Path, path)),
             };
 
             return storageView;
@@ -155,7 +155,7 @@ namespace Xstorage.Services
             if (await StorageForUserExistsAsync(storageViewModel.Name, user.Id))
             {
                 modelState.AddModelError("name taken",
-                    $"Name of storage '{storageViewModel.Name}' is already taken");
+                    $"Name of storage '{storageViewModel.Name}' is already exists");
                 return false;
             }
 
