@@ -69,11 +69,11 @@ namespace Xstorage.Repositories
         {
             return level switch
             {
-                SubscriptionLevel.Free => 16_777_216_000L,
+                SubscriptionLevel.Free => 16_106_127_360L,
                 SubscriptionLevel.Basic => 107_374_182_400L,
                 SubscriptionLevel.Standart => 268_435_456_000L,
                 SubscriptionLevel.Premium => 536_870_912_000L,
-                _ => 0,
+                _ => 0, // IS NOT POSSIBLE BUT IS DEFAULT!!!!!!!!!!!!!!
             };
         }
 
@@ -114,12 +114,12 @@ namespace Xstorage.Repositories
             throw new NotImplementedException("n");
         }
 
-        public async Task EditSubscriptionExpireDateAsync(string id, DateTimeOffset dateExpire)
+        private async Task EditSubscriptionExpireDateAsync(string id, DateTimeOffset dateExpire)
         {
             throw new NotImplementedException("n");
         }
 
-        public async Task EditSubscriptionStartDateAsync(string id, DateTimeOffset dateExpire)
+        private async Task EditSubscriptionStartDateAsync(string id, DateTimeOffset dateExpire)
         {
             throw new NotImplementedException("n");
         }
