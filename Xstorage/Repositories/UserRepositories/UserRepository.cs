@@ -126,5 +126,10 @@ namespace Xstorage.Repositories
 
             return dirSize;
         }
+
+        public static bool UserCanUploadFile(long bytesUserTakes, long bytesAvailable, long fileSize)
+        {
+            return bytesAvailable > bytesUserTakes + fileSize;
+        }
     }
 }

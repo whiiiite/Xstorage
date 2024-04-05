@@ -14,7 +14,6 @@ namespace Xstorage.Extentions
             // old code :..(
             //return time switch
             //{
-            //    Humanizer.TimeSpanHumanizeExtensions.Humanize(time)
             //    { TotalSeconds: < 60 } => FormatPart((int)time.TotalSeconds, "one second ago", "seconds"),
             //    { TotalMinutes: < 60 } => FormatPart((int)time.TotalMinutes, "one minute ago", "minutes"),
             //    { TotalHours: < 24 } => FormatPart((int)time.TotalHours, "an hour ago", "hours"),

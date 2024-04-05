@@ -28,9 +28,9 @@ namespace Xstorage.Api.ApiControllers
         [HttpGet]
         public async Task<IActionResult> StorageList()
         {
-            User u = await userRepository.GetUserAsync(User.Identity);
-            if (u == null) return NotFound();
-            var storages = _context.Storage.Where(x => x.HostId == u.Id).ToList();
+            User user = await userRepository.GetUserAsync(User.Identity);
+            if (user == null) return NotFound();
+            var storages = _context.Storage.Where(x => x.HostId == user.Id).ToList();
             var json = JsonSerializer.Serialize(storages);
             return Ok(json);
         }
@@ -48,7 +48,7 @@ namespace Xstorage.Api.ApiControllers
         }
 
         [HttpPost]
-        public IActionResult UploadFile([FromForm] UploadFileApiViewModel uploadFile)
+        public IActionResult UploadFile([FromBody] UploadFileApiViewModel uploadFile)
         {
             return Ok();
         }

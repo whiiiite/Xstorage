@@ -39,7 +39,7 @@
             <div id="input-dialog-file-section" class="input-container">
                 @using (Html.BeginForm("CreateFile", "Storages", FormMethod.Post,
                new { id = "create-file-form", @class = "input-container", enctype = "multipart/form-data" }))
-                {
+               {
                     @Html.AntiForgeryToken()
 
                     <input style="display: none;" name="storageId" value="@Model.Id" />
@@ -53,7 +53,7 @@
 
                     <input id="create-file-submit" class="create-button"
                            type="submit" value="Create" />
-                }
+               }
                 <span id="upload-file-error-span" style="color: red;"></span>
             </div>
         </div>
@@ -172,8 +172,17 @@
                                     else
                                     {
                                         <div style="display: flex; align-items: center;">
-                                            <img width="22" height="22" src="~/images/file-light.png" />
-                                            <a style="margin-left: 10px;" href="#file">@item.Name</a>
+                                            @if (item.IconName == null)
+                                            {
+                                                <img style="object-fit: contain;" 
+                                                class="w28p h28p" src="~/images/file-light.png" />
+                                            } 
+                                            else
+                                            {
+                                                <img style="object-fit: contain;" 
+                                                class="w28p h28p" src="~/images/@item.IconName" />
+                                            }
+                                            <a style="margin-left: 10px;" href="#viewfile">@item.Name</a>
                                         </div>
                                     }
                                 </div>

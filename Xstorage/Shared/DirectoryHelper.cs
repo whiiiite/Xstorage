@@ -26,7 +26,7 @@ namespace Xstorage.Shared
             string path;
             do
             {
-                path = Path.Combine(StandartPathToFolders, "users_folders", Generator.RandomString(64));
+                path = Path.Combine(StandartPathToFolders, Consts.UserFolders, Generator.RandomString(64));
             }
             while (Directory.Exists(path));
 
@@ -34,21 +34,6 @@ namespace Xstorage.Shared
 
             return path;
         }
-
-
-        private static string Generate64CharsFolderName()
-        {
-            StringBuilder name = new StringBuilder(66); // make it 66 for not to double it in the end
-            string chars = "qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM";
-            Random r = new Random();
-            for (int i = 0; i <= 64; i++)
-            {
-                name.Append(chars[r.Next(0, chars.Length)]);
-            }
-
-            return name.ToString();
-        }
-
 
         /// <summary>
         /// Creates folder for user's storage on server

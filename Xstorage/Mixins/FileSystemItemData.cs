@@ -26,5 +26,30 @@ namespace Xstorage.Mixins
                 return DateTime.Now.Subtract(LastEditDate).TimeAgoToString();
             }
         }
+        /// <summary>
+        /// Returns extention of file with dot
+        /// </summary>
+        public string Extention
+        {
+            get
+            {
+                return System.IO.Path.GetExtension(Name);
+            }
+        }
+        /// <summary>
+        /// Returns icon name for file extention
+        /// </summary>
+        public string? IconName
+        {
+            get
+            {
+                string name = Extention.Substring(1);
+                if(!File.Exists($"wwwroot/images/{name}-icon.png"))
+                {
+                    return null;
+                }
+                return $"{name}-icon.png";
+            }
+        }
     }
 }

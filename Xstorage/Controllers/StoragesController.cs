@@ -11,6 +11,7 @@ using Xstorage.Entities.ViewModels;
 using Xstorage.Shared;
 using Xstorage.Repositories;
 using Xstorage.Services;
+using Xstorage.Shared.Models;
 
 namespace Xstorage.Controllers
 {
@@ -73,10 +74,10 @@ namespace Xstorage.Controllers
 
                 return _context.Storage != null ?
                             View(await _context.Storage
-                                                        .OrderBy(p => p.Name)
-                                                        .Where(x => x.HostId == userId && !x.IsDeleted)
-                                                        .Skip((page - 1) * pageSize)
-                                                        .Take(pageSize).ToListAsync()) :
+                                               .OrderBy(p => p.Name)
+                                               .Where(x => x.HostId == userId && !x.IsDeleted)
+                                               .Skip((page - 1) * pageSize)
+                                               .Take(pageSize).ToListAsync()) :
                             Problem("Entity set 'XstorageDbContext.Storage'  is null.");
             }
             catch(Exception e )
@@ -88,17 +89,15 @@ namespace Xstorage.Controllers
         // GET: Storages/Details/5
         public async Task<IActionResult> Details(string id, string path)
         {
-
-                if (User.Identity == null) return NotFound("Not found_1");
-                DetailStorageViewModel? storageView = await storageService.DetailsAsync(id, path, User.Identity);
-
-                if (storageView == null)
-                {
-                    return NotFound("Not found_2");
-                }
-
-                return View(storageView);
-
+            if (User.Identity == null) return NotFound("Not found_1");
+            DetailStorageViewModel? storageView = await storageService.DetailsAsync(id, path, User.Identity);
+            
+            if (storageView == null)
+            {
+                return NotFound("Not found_2");
+            }
+            
+            return View(storageView);
         }
 
 
@@ -146,7 +145,11 @@ namespace Xstorage.Controllers
         {
             try
             {
-                await storageService.CreateFilesAsync(fileViewModel);
+                CreationFilesResult result = await storageService.CreateFilesAsync(fileViewModel, User.Identity);
+                if(!result.IsSuccess)
+                {
+                    return View("Message", result.Message);
+                }
                 logger.LogInformation("{email} created directory in storage {id}", User.Identity.Name, fileViewModel.StorageId);
                 return RedirectToAction(nameof(Details),
                     new { id = fileViewModel.StorageId, fileViewModel.Path });
@@ -219,7 +222,7 @@ namespace Xstorage.Controllers
             try
             {
                 await Task.Delay(1);
-                return View(nameof(FileViewer));
+                return View();
             }
             catch (Exception)
             {

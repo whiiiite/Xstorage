@@ -7,6 +7,7 @@ using System.Security.Principal;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Runtime.CompilerServices;
 using Xstorage.Shared;
+using Xstorage.Shared.Models;
 
 namespace Xstorage.Services
 {
@@ -18,14 +19,17 @@ namespace Xstorage.Services
         readonly XstorageDbContext context;
         readonly UserRepository userRepository;
         readonly StorageRepository storageRepository;
+        readonly SubscriptionRepository subscriptionRepository;
 
         public StorageService(XstorageDbContext context,
             UserRepository userRepository, 
-            StorageRepository storageRepository) 
+            StorageRepository storageRepository,
+            SubscriptionRepository subscriptionRepository) 
         {
             this.context = context;
             this.userRepository = userRepository;
             this.storageRepository = storageRepository;
+            this.subscriptionRepository = subscriptionRepository;
         }
 
 
@@ -96,29 +100,58 @@ namespace Xstorage.Services
         /// <param name="fileViewModel"></param>
         /// <param name="identity"></param>
         /// <returns></returns>
-        public async Task CreateFilesAsync(UploadFileViewModel fileViewModel)
+        public async Task<CreationFilesResult> CreateFilesAsync(UploadFileViewModel fileViewModel, IIdentity userIdentity)
         {
             Storage? storage = await storageRepository.GetStorage(fileViewModel.StorageId);
-            if (storage == null) return;
+            if (storage == null) return new CreationFilesResult() 
+            {
+                IsSuccess = false, Message = "Storage is null" 
+            };
             string path = Path.Combine(storage.Path.Replace(storage.Name, ""), fileViewModel.Path);
             IEnumerable<IFormFile>? formFiles = fileViewModel.Files;
 
             // if user uploaded something from local
             if (formFiles != null)
             {
+                bool isBreakedDueSize = false;
                 await Task.Run(async () =>
                 {
                     foreach (var formFile in formFiles)
                     {
+                        User? user = await userRepository.GetUserAsync(userIdentity);
+                        Entities.Models.Subscription? userSub = await subscriptionRepository.GetUserSubscriptionAsync(user);
+                        long userBytesTakes = await userRepository.CountMemoryUserTakesInServerAsync(userIdentity);
+                        long available = SubscriptionRepository.GetAvailableBytesForLevel(userSub.Level);
+                        if(!UserRepository.UserCanUploadFile(userBytesTakes, available, formFile.Length)) 
+                        {
+                            isBreakedDueSize = true;
+                            break;
+                        }
+
                         await CreateFileAsync(formFile, path);
                     }
                 });
+
+                if(isBreakedDueSize)
+                {
+                    return new CreationFilesResult()
+                    {
+                        IsSuccess = false,
+                        Message = "Your storage size limit is reached"
+                    };
+                }
             }
             else // if user want to create empty file 
             {
                 string fileName = fileViewModel.FileName;
                 FileHelper.CreateFileInStorage(path, fileName);
             }
+
+            return new CreationFilesResult()
+            {
+                IsSuccess = true,
+                Message = "OK"
+            };
         }
 
         /// <summary>
