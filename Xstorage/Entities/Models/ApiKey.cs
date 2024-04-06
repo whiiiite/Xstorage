@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Xstorage.Shared;
 
 namespace Xstorage.Entities.Models
 {
@@ -8,6 +9,7 @@ namespace Xstorage.Entities.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; } = null!;
+        [MaxLength(Consts.MaxApiKeyLength)]
         public required string Key { get; set; }
         public required long CallsCount { get; set; }
         public required DateTime DateExpire { get; set; }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Xstorage.Entities.Models;
+using Xstorage.Shared;
 
 namespace Xstorage.Configurations
 {
@@ -9,11 +10,7 @@ namespace Xstorage.Configurations
     {
         public void Configure(EntityTypeBuilder<ApiKey> builder)
         {
-            builder.HasOne(k=>k.User)
-                .WithOne(u=>u.ApiKey)
-                .HasForeignKey<ApiKey>(k=>k.UserId)
-                .IsRequired();
-
+            builder.Property(k=>k.Key).HasMaxLength(Consts.MaxApiKeyLength);
             builder.HasIndex(k=>k.Key).IsUnique();
         }
     }

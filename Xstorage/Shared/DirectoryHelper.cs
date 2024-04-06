@@ -12,7 +12,7 @@ namespace Xstorage.Shared
         {
             get
             {
-                return "C:\\";
+                return Path.GetPathRoot(Environment.SystemDirectory) ?? "C:\\";
             }
         }
 
@@ -57,35 +57,36 @@ namespace Xstorage.Shared
             IEnumerable<DirectoryInfo> dirs = dirinfo.GetDirectories();
             IEnumerable<FileInfo> files = dirinfo.GetFiles();
 
-            FileSystemItemData[] names = new FileSystemItemData[dirs.Count() + files.Count()];
+            int arraySize = dirs.Count() + files.Count();
+            FileSystemItemData[] data = new FileSystemItemData[arraySize];
             int indexer = 0;
-            foreach (var item in dirs)
+            foreach (var dir in dirs)
             {
-                names[indexer] = new FileSystemItemData
+                data[indexer] = new FileSystemItemData
                 {
-                    Name = item.Name,
-                    Path = item.FullName,
-                    LastEditDate = item.LastWriteTime,
+                    Name = dir.Name,
+                    Path = dir.FullName,
+                    LastEditDate = dir.LastWriteTime,
                     Size = 0,
                     IsDirectory = true
                 };
                 indexer++;
             }
 
-            foreach (var item in files)
+            foreach (var file in files)
             {
-                names[indexer] = new FileSystemItemData
+                data[indexer] = new FileSystemItemData
                 {
-                    Name = item.Name,
-                    Path = item.FullName,
-                    LastEditDate = item.LastWriteTime,
-                    Size = item.Length,
+                    Name = file.Name,
+                    Path = file.FullName,
+                    LastEditDate = file.LastWriteTime,
+                    Size = file.Length,
                     IsDirectory = false
                 };
                 indexer++;
             }
 
-            return names;
+            return data;
         }
 
 

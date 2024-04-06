@@ -13,22 +13,24 @@ namespace Xstorage.Shared
         /// <returns>Path of created file</returns>
         public static string CreateFileInStorage(string path, string fileName)
         {
-            string fname = Path.Combine(path, fileName);
-            fname = GetUniqueFilePath(fname);
-            File.Create(fname).Close();
-            return fname;
+            string filePath = Path.Combine(path, fileName);
+            fileName = GetUniqueFileName(filePath);
+            filePath = Path.Combine(path, fileName);
+            File.Create(filePath).Close();
+            return filePath;
         }
 
-        /// <summary>
+        /// <summary>w
         /// Finds unique file name and return it
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static string GetUniqueFilePath(string filePath)
+        public static string GetUniqueFileName(string filePath)
         {
+            string newFileName = Path.GetFileName(filePath);
             if (File.Exists(filePath))
             {
-                string folderPath = Path.GetDirectoryName(filePath);
+                string folderPath = Path.GetDirectoryName(filePath)!;
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 string fileExtension = Path.GetExtension(filePath);
                 int number = 1;
@@ -41,7 +43,6 @@ namespace Xstorage.Shared
                     number = int.Parse(regex.Groups[2].Value);
                 }
 
-                string newFileName;
                 do
                 {
                     newFileName = $"{fileName}({number}){fileExtension}";
@@ -51,7 +52,7 @@ namespace Xstorage.Shared
                 while (File.Exists(filePath));
             }
 
-            return filePath;
+            return newFileName;
         }
     }
 }
