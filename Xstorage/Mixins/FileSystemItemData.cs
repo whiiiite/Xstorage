@@ -44,7 +44,7 @@ namespace Xstorage.Mixins
             get
             {
                 string name = Extention.Substring(1);
-                if(!File.Exists($"wwwroot/images/{name}-icon.png"))
+                if(!File.Exists($"wwwroot/images/exts/{name}-icon.png"))
                 {
                     return null;
                 }

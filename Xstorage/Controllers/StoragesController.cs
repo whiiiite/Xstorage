@@ -12,6 +12,7 @@ using Xstorage.Shared;
 using Xstorage.Repositories;
 using Xstorage.Services;
 using Xstorage.Shared.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Xstorage.Controllers
 {
@@ -24,8 +25,10 @@ namespace Xstorage.Controllers
         private readonly UserRepository userRepository;
         private readonly StorageRepository storageRepository;
         private readonly SubscriptionRepository subscriptionRepository;
+
         private static int currentPage = 0;
         private static int currentPageSize = 0;
+
         private readonly ILogger<StoragesController> logger;
 
         public StoragesController(XstorageDbContext context, 
@@ -65,12 +68,13 @@ namespace Xstorage.Controllers
                     await subscriptionRepository.AddSubscriptionAsync(
                         SubscriptionRepository.InitSubscription(user.Id));
                 }
+                userSub = await subscriptionRepository.GetUserSubscriptionAsync(user);
 
                 long userBytesTakes = await userRepository.CountMemoryUserTakesInServerAsync(User.Identity!);
-                long available = SubscriptionRepository.GetAvailableBytesForLevel(userSub.Level);
+                long available = SubscriptionRepository.GetAvailableBytesForLevel(userSub!.Level);
                 ViewBag.MemUserTakes = userBytesTakes.BytesLengthToString();
                 ViewBag.MemAvailableForUser = available.BytesLengthToString();
-                ViewBag.PercentTaken = Math.Round(userBytesTakes / available * 100d, 2);
+                ViewBag.PercentTaken = Math.Ceiling((double)userBytesTakes / available * 100d);
 
                 return _context.Storage != null ?
                             View(await _context.Storage
@@ -80,24 +84,31 @@ namespace Xstorage.Controllers
                                                .Take(pageSize).ToListAsync()) :
                             Problem("Entity set 'XstorageDbContext.Storage'  is null.");
             }
-            catch(Exception e )
+            catch (Exception ex)
             {
-                return NotFound($"Page was not found {e}");
+                return View("Message", ex.Message);
             }
         }
 
         // GET: Storages/Details/5
         public async Task<IActionResult> Details(string id, string path)
         {
-            if (User.Identity == null) return NotFound("Not found_1");
-            DetailStorageViewModel? storageView = await storageService.DetailsAsync(id, path, User.Identity);
-            
-            if (storageView == null)
+            try
             {
-                return NotFound("Not found_2");
+                if (User.Identity == null) throw new Exception("User is not logged");
+                DetailStorageViewModel? storageView = await storageService.DetailsAsync(id, path, User.Identity);
+
+                if (storageView == null)
+                {
+                    throw new Exception("Storage is null");
+                }
+
+                return View(storageView);
             }
-            
-            return View(storageView);
+            catch(Exception ex)
+            {
+                return View("Message", ex.Message);
+            }
         }
 
 
@@ -111,13 +122,20 @@ namespace Xstorage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] StorageViewModel storageViewModel)
         {
-            if (await storageService.CreateStorageAsync(storageViewModel, ModelState, User.Identity))
+            try
             {
-                return RedirectToAction(nameof(Index));
+                if (await storageService.CreateStorageAsync(storageViewModel, ModelState, User.Identity))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                logger.LogInformation("{email} created storage {Name}",
+                    User.Identity.Name, storageViewModel.Name);
+                return View(storageViewModel);
             }
-            logger.LogInformation("{email} created storage {Name}",
-                User.Identity.Name, storageViewModel.Name);
-            return View(storageViewModel);
+            catch (Exception e)
+            {
+                return View("Message", e.Message);
+            }
         }
 
 
@@ -133,9 +151,9 @@ namespace Xstorage.Controllers
                 logger.LogInformation("{email} created directory in storage {id}", User.Identity.Name, storageId);
                 return RedirectToAction(nameof(Details), new { id = storageId, path });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NotFound("Page was not found");
+                return View("Message", e.Message);
             }
         }
 
@@ -154,9 +172,9 @@ namespace Xstorage.Controllers
                 return RedirectToAction(nameof(Details),
                     new { id = fileViewModel.StorageId, fileViewModel.Path });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NotFound("Page was not found");
+                return View("Message", e.Message);
             }
         }
 
@@ -179,9 +197,9 @@ namespace Xstorage.Controllers
 
                 return File(contents, "*/*", path.Split('\\').TakeLast(1).First());
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NotFound("Page was not found");
+                return View("Message", e.Message);
             }
         }
 
@@ -204,9 +222,9 @@ namespace Xstorage.Controllers
                 return RedirectToAction(nameof(Details),
                     new { id, path = currentPath });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NotFound("Page was not found");
+                return View("Message", e.Message);
             }
         }
 
@@ -224,9 +242,9 @@ namespace Xstorage.Controllers
                 await Task.Delay(1);
                 return View();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NotFound("Page was not found");
+                return View("Message", e.Message);
             }
         } 
 
@@ -249,9 +267,9 @@ namespace Xstorage.Controllers
 
                 return View(storage);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NotFound("Page was not found");
+                return View("Message", e.Message);
             }
         }
 
@@ -275,9 +293,9 @@ namespace Xstorage.Controllers
                 logger.LogInformation("{email} have deleted storage", User.Identity.Name);
                 return RedirectToAction(nameof(Index), new { page = currentPage, pageSize = currentPageSize });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NotFound("Page was not found");
+                return View("Message", e.Message);
             }
         }
 

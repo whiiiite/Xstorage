@@ -16,9 +16,11 @@
         <a asp-action="CreateTestStorages" asp-route-count="120">Create test 120</a>
     }
 </p>
-<span>You takes @ViewBag.MemUserTakes of memory space of @ViewBag.MemAvailableForUser</span>
+<span>You takes @ViewBag.PercentTaken @ViewBag.MemUserTakes of memory space of @ViewBag.MemAvailableForUser</span>
 <br />
-<progress max="100" value="@((int)ViewBag.PercentTaken)"></progress>
+<div class="progress" style="width: 15%;">
+    <div style="width: @ViewBag.PercentTaken%;" class="progress-bar progress-bar-striped"></div>
+</div>
 <table class="table">
     <thead>
         <tr>

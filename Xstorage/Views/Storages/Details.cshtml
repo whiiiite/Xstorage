@@ -179,10 +179,11 @@
                                             } 
                                             else
                                             {
-                                                <img style="object-fit: contain;" 
-                                                class="w28p h28p" src="~/images/@item.IconName" />
+                                                <img style="object-fit: contain;"
+                                                     class="w28p h28p" src="~/images/exts/@item.IconName" />
                                             }
-                                            <a style="margin-left: 10px;" href="#viewfile">@item.Name</a>
+                                            <a style="margin-left: 10px;" asp-action="FileViewer" 
+                                            asp-route-path="@System.IO.Path.Combine(Model.Path, item.Name)">@item.Name</a>
                                         </div>
                                     }
                                 </div>
