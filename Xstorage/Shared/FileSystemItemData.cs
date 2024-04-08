@@ -1,14 +1,13 @@
 ﻿using Xstorage.Extentions;
-using Xstorage.Shared;
 
-namespace Xstorage.Mixins
+namespace Xstorage.Shared
 {
     public class FileSystemItemData
     {
         public required string Name { get; set; }
         public required string Path { get; set; }
-        public required bool IsDirectory { get; set; }   
-        public required DateTime LastEditDate { get; set; }  
+        public required bool IsDirectory { get; set; }
+        public required DateTime LastEditDate { get; set; }
         public required long Size { get; set; }
         public string SizeInString
         {
@@ -43,8 +42,11 @@ namespace Xstorage.Mixins
         {
             get
             {
+                if (Extention.Length <= 1)
+                    return null;
+
                 string name = Extention.Substring(1);
-                if(!File.Exists($"wwwroot/images/exts/{name}-icon.png"))
+                if (!File.Exists($"wwwroot/images/exts/{name}-icon.png"))
                 {
                     return null;
                 }

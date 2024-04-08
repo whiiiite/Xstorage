@@ -2,7 +2,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Xstorage.Entities.Models;
-using Xstorage.Mixins;
 
 namespace Xstorage.Shared
 {
@@ -12,6 +11,26 @@ namespace Xstorage.Shared
         {
             get
             {
+                return FreeDrive;
+            }
+        }
+
+        /// <summary>
+        /// Returns first free drive
+        /// </summary>
+        private static string FreeDrive
+        {
+            get
+            {
+                DriveInfo[] allDrives = DriveInfo.GetDrives();
+                foreach (var drive in allDrives)
+                {
+                    if (drive.AvailableFreeSpace > Consts.Size_15GB)
+                    {
+                        return drive.Name;
+                    }
+                }
+
                 return Path.GetPathRoot(Environment.SystemDirectory) ?? "C:\\";
             }
         }

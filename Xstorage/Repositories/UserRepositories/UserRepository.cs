@@ -121,7 +121,8 @@ namespace Xstorage.Repositories
             foreach (var storage in storages)
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(storage.FullPath);
-                dirSize += await Task.Run(() => dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length));
+                dirSize += await Task.Run(() => dirInfo.EnumerateFiles("*", 
+                    SearchOption.AllDirectories).Sum(file => file.Length));
             }
 
             return dirSize;

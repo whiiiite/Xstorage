@@ -1,6 +1,4 @@
-﻿using Xstorage.Mixins;
-
-namespace Xstorage.Entities.ViewModels
+﻿namespace Xstorage.Entities.ViewModels
 {
     public class StorageViewModel
     {

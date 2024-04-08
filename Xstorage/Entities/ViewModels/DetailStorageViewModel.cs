@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.ComponentModel;
-using Xstorage.Mixins;
+using Xstorage.Shared;
 
 namespace Xstorage.Entities.ViewModels
 {

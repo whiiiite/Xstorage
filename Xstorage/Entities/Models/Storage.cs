@@ -20,11 +20,9 @@ namespace Xstorage.Entities.Models
         [DisplayName("Storage is private")]
         public required bool IsPrivate { get; set; }
 
-
-        private string path;
         [Required]
         [DisplayName("Path to storage")]
-        public required string Path { get { return path.Remove(path.Length - Name.Length); } set { path = value; } }
+        public required string Path { get; set; }
 
         [NotMapped]
         public string FullPath

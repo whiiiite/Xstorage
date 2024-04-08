@@ -107,7 +107,7 @@ namespace Xstorage.Services
             {
                 IsSuccess = false, Message = "Storage is null" 
             };
-            string path = Path.Combine(storage.Path.Replace(storage.Name, ""), fileViewModel.Path);
+            string path = Path.Combine(storage.Path, fileViewModel.Path);
             IEnumerable<IFormFile>? formFiles = fileViewModel.Files;
 
             // if user uploaded something from local

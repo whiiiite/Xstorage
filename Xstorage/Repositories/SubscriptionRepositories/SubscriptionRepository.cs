@@ -2,6 +2,7 @@
 using Xstorage.Data;
 using Xstorage.Entities.Models;
 using Xstorage.Enums;
+using Xstorage.Shared;
 
 namespace Xstorage.Repositories
 {
@@ -69,10 +70,10 @@ namespace Xstorage.Repositories
         {
             return level switch
             {
-                SubscriptionLevel.Free => 16_106_127_360L,
-                SubscriptionLevel.Basic => 107_374_182_400L,
-                SubscriptionLevel.Standart => 268_435_456_000L,
-                SubscriptionLevel.Premium => 536_870_912_000L,
+                SubscriptionLevel.Free => Consts.Size_15GB,
+                SubscriptionLevel.Basic => Consts.Size_100GB,
+                SubscriptionLevel.Standart => Consts.Size_250GB,
+                SubscriptionLevel.Premium => Consts.Size_500GB,
                 _ => 0, // IS NOT POSSIBLE BUT IS DEFAULT!!!!!!!!!!!!!!
             };
         }
