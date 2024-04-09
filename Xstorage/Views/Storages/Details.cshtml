@@ -199,7 +199,7 @@
                                         <div class="gray-circle-on-hover">
                                             <a class="action-link-btn" asp-action="GetFile" asp-controller="Storages"
                                             asp-route-storageId="@Model.Id"
-                                            asp-route-name="@item.Name" download>
+                                            asp-route-path="@System.IO.Path.Combine(Model.Path, item.Name)" download>
                                                 <img class="w28p h28p" src="~/images/dowload-file-light.png" />
                                             </a>
                                         </div>

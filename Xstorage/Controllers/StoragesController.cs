@@ -179,22 +179,13 @@ namespace Xstorage.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetFile(string storageId, string name)
+        public async Task<IActionResult> GetFile(string storageId, string path)
         {
             try
             {
-                if (User.Identity == null) return NotFound();
-
-                string path = Path.Combine((await storageRepository.GetStorage(storageId)).Path, name);
-
-                if (!System.IO.File.Exists(path))
-                {
-                    return NotFound("File does not exists");
-                }
-
-                byte[] contents = await System.IO.File.ReadAllBytesAsync(path);
-
-                return File(contents, "*/*", path.Split('\\').TakeLast(1).First());
+                path = Path.Combine((await storageRepository.GetStorage(storageId)).Path, path);
+                string fileName = Path.GetFileName(path);
+                return PhysicalFile(path, "*/*", fileName);
             }
             catch (Exception e)
             {
