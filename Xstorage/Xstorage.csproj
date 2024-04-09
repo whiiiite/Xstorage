@@ -33,4 +33,9 @@
     <Folder Include="Services\User\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\lib\look-format\look-format.js" />
+    <None Include="wwwroot\lib\look-format\look-format.min.js" />
+  </ItemGroup>
+
 </Project>

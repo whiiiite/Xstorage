@@ -1,6 +1,6 @@
 ﻿@model Xstorage.Entities.ViewModels.DetailStorageViewModel;
-@    using Xstorage.Mixins;
-@    using Xstorage.Extentions;
+@using Xstorage.Shared;
+@using Xstorage.Extentions;
     using Xstorage.Shared;
 @inject Xstorage.Data.XstorageDbContext context;
 
@@ -184,6 +184,7 @@
                                                      class="w28p h28p" src="~/images/exts/@item.IconName" />
                                             }
                                             <a style="margin-left: 10px;" asp-action="FileViewer" 
+                                            asp-route-storageId="@Model.Id"
                                             asp-route-path="@System.IO.Path.Combine(Model.Path, item.Name)">@item.Name</a>
                                         </div>
                                     }

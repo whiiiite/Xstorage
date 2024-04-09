@@ -12,7 +12,6 @@ using Xstorage.Shared;
 using Xstorage.Repositories;
 using Xstorage.Services;
 using Xstorage.Shared.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Xstorage.Controllers
 {
@@ -86,7 +85,7 @@ namespace Xstorage.Controllers
             }
             catch (Exception ex)
             {
-                return View("Message", ex.Message);
+                throw;
             }
         }
 
@@ -107,7 +106,7 @@ namespace Xstorage.Controllers
             }
             catch(Exception ex)
             {
-                return View("Message", ex.Message);
+                throw;
             }
         }
 
@@ -235,12 +234,18 @@ namespace Xstorage.Controllers
         /// <param name="path"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> FileViewer(string path)
+        public async Task<IActionResult> FileViewer(string storageId, string path)
         {
             try
             {
-                await Task.Delay(1);
-                return View();
+                string fileName = Path.GetFileName(path);
+
+                return View(new FileViewerViewModel()
+                {
+                    StorageId = storageId,
+                    Path = path,
+                    FileName = fileName,
+                });;
             }
             catch (Exception e)
             {

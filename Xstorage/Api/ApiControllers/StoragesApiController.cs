@@ -6,23 +6,27 @@ using Xstorage.Api.ApiViewModels;
 using Xstorage.Data;
 using Xstorage.Entities.Models;
 using Xstorage.Repositories;
+using Xstorage.Shared;
 
 namespace Xstorage.Api.ApiControllers
 {
-    [Route("api/storages")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class StoragesApiController : ControllerBase
     {
         readonly ILogger<StoragesApiController> logger;
         readonly XstorageDbContext _context;
         readonly UserRepository userRepository;
+        readonly StorageRepository storageRepository;
 
         public StoragesApiController(ILogger<StoragesApiController> logger, XstorageDbContext context,
-            UserRepository userRepository) 
+            UserRepository userRepository,
+            StorageRepository storageRepository) 
         {
             this.logger = logger;
             this._context = context;
             this.userRepository = userRepository;
+            this.storageRepository = storageRepository;
         }
 
         [HttpGet]
@@ -36,39 +40,53 @@ namespace Xstorage.Api.ApiControllers
         }
 
         [HttpGet]
-        public IActionResult Details(string storageId, string path)
+        public IActionResult Details([FromQuery] string apiKey, [FromQuery] string storageId, [FromQuery] string path)
         {
             return Ok();
         }
 
         [HttpGet]
-        public IActionResult GetFile(string storageId, string path)
+        public IActionResult GetFile([FromQuery] string apiKey, [FromQuery] string storageId, [FromQuery] string path)
         {
             return Ok();
         }
 
         [HttpPost]
-        public IActionResult UploadFile([FromBody] UploadFileApiViewModel uploadFile)
+        public IActionResult UploadFile([FromQuery] string apiKey, [FromBody] UploadFileApiViewModel uploadFile)
         {
             return Ok();
         }
 
         [HttpGet]
-        public IActionResult GetApiKey(string userNameOrEmail, string userPassword)
+        public IActionResult GetApiKey([FromQuery] string userNameOrEmail, [FromQuery] string userPassword)
         {
             return Ok();
         }
 
         [HttpGet]
-        public IActionResult RefreshApiKey(string oldKey)
+        public IActionResult RefreshApiKey([FromQuery] string oldKey)
         {
             return Ok();
         }
 
         [HttpGet]
-        public IActionResult DeleteApiKey(string apiKey)
+        public IActionResult DeleteApiKey([FromQuery] string apiKey)
         {
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFileText([FromQuery] string storageId, [FromQuery] string path)
+        {
+            Storage? storage = await storageRepository.GetStorage(storageId);
+            if (storage == null)
+            {
+                return NotFound("not found");
+            }
+
+            path = Path.Combine(storage.Path, path);
+            string text = System.IO.File.ReadAllText(path, System.Text.Encoding.UTF8);
+            return Ok(text);
         }
     }
 }

@@ -1,8 +1,26 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Xstorage.Entities.ViewModels.FileViewerViewModel;
+@using Xstorage.Shared;
 @{
     ViewData["Title"] = "File Viewer";
 }
 
-<p>File viewer works!</p>
+<div id="file-viewer"></div>
+@section Scripts {
+    <script src="~/lib/look-format/look-format.js" asp-append-version="true"></script>
+    <script asp-append-version="true">
+        // weird solution but it for start
+        view("#file-viewer", '@Model.FileName', String.raw`@Context.Request.Scheme://@Context.Request.Host/api/storagesapi/GetFileText?storageId=@Model.StorageId&path=@Model.Path`, {
+            padding: '10px',
+            fontFamily: 'Tahoma',
+            fontSize: '12px',
+            numberColor: 'gray',
+            textColor: 'wheat',
+            marginBetweenStrings: '4px',
+            width: '100%',
+            height: '20%',
+            bg: 'black',
+            readFromNetwork: true,
+            numerated: true
+        });
+    </script>
+}

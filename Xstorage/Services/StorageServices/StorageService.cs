@@ -199,7 +199,7 @@ namespace Xstorage.Services
                     Name = storageViewModel.Name,
                     IsPrivate = storageViewModel.IsPrivate,
                     IsDeleted = false,
-                    Path = Path.Combine(user.FolderPath, storageViewModel.Name),
+                    Path = user.FolderPath,
                     HostId = user.Id!
                 };
 
