@@ -8,7 +8,6 @@
 @section Scripts {
     <script src="~/lib/look-format/look-format.js" asp-append-version="true"></script>
     <script asp-append-version="true">
-        // weird solution but it for start
         view("#file-viewer", '@Model.FileName', String.raw`@Context.Request.Scheme://@Context.Request.Host/api/storagesapi/GetFileText?storageId=@Model.StorageId&path=@Model.Path`, {
             padding: '10px',
             fontFamily: 'Tahoma',

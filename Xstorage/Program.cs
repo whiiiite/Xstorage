@@ -37,6 +37,26 @@ namespace Xstorage
            .AddRoles<IdentityRole>()
            .AddEntityFrameworkStores<XstorageDbContext>();
 
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("CorsAllowAll_NONSECURE",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+                options.AddPolicy("CorsServerOnly",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:5028",
+                                            "https://localhost:7201")
+                               .WithMethods("GET", "POST")
+                               .AllowAnyHeader();
+                    });
+            });
+
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<JwtHandler>();
             builder.Services.AddScoped<StorageRepository>();
@@ -66,6 +86,8 @@ namespace Xstorage
                 };
             });
 
+
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
@@ -83,6 +105,7 @@ namespace Xstorage
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseAuthorization();
 

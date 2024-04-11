@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -12,6 +13,7 @@ namespace Xstorage.Api.ApiControllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [EnableCors("CorsAllowAll_NONSECURE")]
     public class StoragesApiController : ControllerBase
     {
         readonly ILogger<StoragesApiController> logger;
